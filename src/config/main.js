@@ -19,8 +19,6 @@ function createRegionGroup(name, icon, proxies) {
 // --- 主入口 ---
 
 function main(config) {
-  if (!enable) return config;
-
   // 排除匹配到的节点
   if (excludeFilterEnable && Array.isArray(config.proxies)) {
     config.proxies = config.proxies.filter(

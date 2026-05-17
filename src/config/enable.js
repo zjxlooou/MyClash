@@ -3,13 +3,6 @@
 // 脚本链接：https://raw.githubusercontent.com/AIsouler/MyClash/refs/heads/main/Script/mihomoScript.js
 
 /**
- * 整个脚本的总开关
- * true = 启用
- * false = 禁用
- */
-const enable = true;
-
-/**
  * 分流规则配置，会自动生成对应的策略组
  * true = 启用
  * false = 禁用
