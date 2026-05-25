@@ -242,6 +242,15 @@ const urlTestBaseOption = {
   hidden: true,
 };
 
+// load-balance策略组通用配置
+const loadBalanceBaseOption = {
+  ...groupBaseOption,
+  type: 'load-balance',
+  strategy: 'sticky-sessions',
+  icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Round_Robin.png',
+  hidden: true,
+};
+
 // 定义分流策略组配置
 const serviceConfigs = [
   {
@@ -565,6 +574,7 @@ const serviceConfigs = [
 // 定义创建地区策略组的函数
 function createRegionGroup(name, icon, proxies) {
   const autoTestName = `${name}-自动选择`;
+  const loadBalanceName = `${name}-负载均衡`;
   return [
     {
       ...urlTestBaseOption,
@@ -572,10 +582,15 @@ function createRegionGroup(name, icon, proxies) {
       proxies,
     },
     {
+      ...loadBalanceBaseOption,
+      name: loadBalanceName,
+      proxies,
+    },
+    {
       ...selectBaseOption,
       name,
       icon,
-      proxies: [autoTestName, ...proxies],
+      proxies: [autoTestName, loadBalanceName, ...proxies],
     },
   ];
 }

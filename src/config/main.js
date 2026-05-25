@@ -1,6 +1,7 @@
 // 定义创建地区策略组的函数
 function createRegionGroup(name, icon, proxies) {
   const autoTestName = `${name}-自动选择`;
+  const loadBalanceName = `${name}-负载均衡`;
   return [
     {
       ...urlTestBaseOption,
@@ -8,10 +9,15 @@ function createRegionGroup(name, icon, proxies) {
       proxies,
     },
     {
+      ...loadBalanceBaseOption,
+      name: loadBalanceName,
+      proxies,
+    },
+    {
       ...selectBaseOption,
       name,
       icon,
-      proxies: [autoTestName, ...proxies],
+      proxies: [autoTestName, loadBalanceName, ...proxies],
     },
   ];
 }
