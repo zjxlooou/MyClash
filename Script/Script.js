@@ -477,7 +477,7 @@ function main(config) {
   newConfig['keep-alive-interval'] = 60;
   newConfig['find-process-mode'] = 'strict';
 
-  newConfig['external-controller'] = '[::]:9090';
+  newConfig['external-controller'] = '127.0.0.1:9090';
   newConfig['external-ui'] = 'ui';
   newConfig['external-ui-url'] = 'https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip';
 
@@ -497,7 +497,7 @@ function main(config) {
   newConfig['tun'] = {
     enable: true,
     stack: 'system',
-    mtu: 9000,
+    mtu: 1500,
     'auto-route': true,
     'strict-route': true,
     'auto-redirect': true,
