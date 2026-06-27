@@ -431,7 +431,6 @@ function main(config) {
   newConfig['dns'] = {
     enable: true,
     ipv6: true,
-    listen: ':1053',
     'cache-algorithm': 'arc',
     'use-hosts': true,
     'use-system-hosts': true,
