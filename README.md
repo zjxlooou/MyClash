@@ -1,33 +1,19 @@
 # MyClash
 
-Mihomo（Clash Meta）配置文件和覆写脚本，分别提供全量版和精简版，无DNS泄露（图一乐），内置多项分流策略、地区策略，实现全局排除节点、自动识别节点倍率等功能
+Mihomo（Clash Meta）配置文件和覆写脚本，分别提供全量版和精简版，无DNS泄露，内置多项分流策略、地区策略，实现全局排除节点、自动识别节点倍率功能，解决机场使用私有DNS导致无法解析节点域名的问题
 
 友情推荐，非常好用、省电且内存占用低的代理软件：[Bettbox](https://github.com/appshubcc/Bettbox)
-
-## 配置文件
-
-> - _配置文件实现的效果和脚本基本一致_
-> - _不支持自定义 **启用/禁用** 策略组_
-> - _无法像脚本那样实现不生成未匹配到节点的策略组_
-
-复制以下任意一个链接或者复制完整代码后导入代理客户端
-
-- [mihomoConfig.yaml（全量版）](/Config/mihomoConfig.yaml)
-
-```txt
-https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfig.yaml
-```
-
-- [mihomoConfigLite.yaml（精简版）](/Config/mihomoConfigLite.yaml)
-
-```txt
-https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfigLite.yaml
-```
 
 ## 覆写脚本
 
 > [!IMPORTANT]
-> **注意⚠️：该脚本仅适用于覆写机场提供的配置文件，请勿用于覆写自己编写的配置文件**
+>
+> - _注意⚠️：该脚本仅适用于覆写机场提供的配置文件，请勿用于覆写自己编写的配置文件_
+> - _脚本已解决机场使用私有DNS导致无法解析节点域名的问题_
+> - _地区策略组根据是否匹配到节点来生成_
+> - _全量版脚本内的分流策略组均支持自定义是否启用（默认启用），支持自定义是否过滤高倍率节点（默认禁用）_
+
+### 使用方法（脚本）
 
 复制以下任意一个链接或者复制完整代码后按如图所示步骤导入到代理客户端，以 [Bettbox](https://github.com/appshubcc/Bettbox) 为例
 
@@ -37,7 +23,7 @@ https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfigLite.
 https://raw.githubusercontent.com/AIsouler/MyClash/main/Script/mihomoScript.js
 ```
 
-- [Script.js（精简版）](/Script/Script.js)
+- [Script.js（精简版）](/Script/Script.js) （仅包含少量分流策略组）
 
 ```txt
 https://raw.githubusercontent.com/AIsouler/MyClash/main/Script/Script.js
@@ -47,21 +33,45 @@ https://raw.githubusercontent.com/AIsouler/MyClash/main/Script/Script.js
 | --------------------------------------------------------------------------------- |
 | ![img](https://raw.githubusercontent.com/AIsouler/MyClash/main/Image/import.webp) |
 
-## 配置和脚本说明
+## 配置文件
+
+> [!IMPORTANT]
+>
+> - _配置文件实现的效果和脚本基本一致_
+> - _不支持自定义是否启用策略组，不支持自定义是否过滤高倍率节点_
+> - _无法像脚本那样实现不生成未匹配到节点的策略组_
+> - _对于使用私有DNS的机场，需要手动将私有DNS填入到配置文件中_
+> - _未匹配到节点的策略组将回退到 REJECT_
+
+### 使用方法（配置）
+
+复制以下任意一个链接或者复制完整代码后导入代理客户端
+
+- [mihomoConfig.yaml（全量版）](/Config/mihomoConfig.yaml)
+
+```txt
+https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfig.yaml
+```
+
+- [mihomoConfigLite.yaml（精简版）](/Config/mihomoConfigLite.yaml)（仅包含少量分流策略组）
+
+```txt
+https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfigLite.yaml
+```
+
+## 说明
 
 - 仅适用于使用 [mihomo 内核](https://github.com/MetaCubeX/mihomo/tree/Alpha) 的代理客户端
 
-- 脚本仅适用于覆写机场提供的配置文件，请勿用于覆写自己编写的配置文件
+- 全量版和精简版仅有分流策略组数量差异，其他基本一致，若不需要很多分流策略组，可使用精简版
 
-- 全量版脚本内策略组、节点组均支持自定义是否启用（默认启用）
-
-- 内置的DNS配置已解决DNS泄露问题（图一乐），建议不要开启代理软件的DNS覆写
+- 内置的DNS配置已解决DNS泄露问题，DNS配置和路由规则是配套的，建议不要开启代理软件的DNS覆写或随意修改
 
 - 规则采用 `rule-set` 模式，按需添加规则集，告别臃肿的 geodata，减少内存占用
 
 - 规则以 `domain` 与 `ipcidr` 行为为主，相比 `classical` 查询效率更高
 
-- 自动排除非国家或地区的信息节点，可自定义是否启用（默认启用）
+- 自动排除非国家或地区的信息节点
 
 - 自动识别节点倍率，并分别归类为独立节点组：
   - 高倍率节点（倍率 ≥2）
@@ -98,7 +108,6 @@ https://raw.githubusercontent.com/AIsouler/MyClash/main/Script/Script.js
 ## 内置节点组
 
 > - _所有组均为手动选择（select），内部包含对应的自动选择策略组和负载均衡策略组_
-> - _若机场订阅中不存在对应节点组的节点，则该节点组不会显示_
 > - _未匹配到地区组的节点节点将归类至 「其他节点」_
 
 - `香港`
