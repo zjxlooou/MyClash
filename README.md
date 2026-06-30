@@ -85,7 +85,7 @@ https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfigLite.
 - `自动选择`
 - `负载均衡`
 - `AI`
-- `YouTube`
+- `Media` （YouTube+TikTok+Instagram+Netflix+HBO+Twitch+Disney+NicoNico+BBC+Pornhub）
 - `FCM`
 - `Google`
 - `GitHub`
@@ -96,12 +96,9 @@ https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfigLite.
 - `Pixiv`
 - `Steam`
 - `Twitter`
-- `Instagram`
 - `Emby`
 - `Spotify`
-- `TikTok`
-- `Netflix`
-- `广告拦截`
+- `AdBlock`
 - `直连` （可自定义IP优先级，建议使用 `IPv4优先`，防止出现一些问题）
 - `漏网之鱼`
 

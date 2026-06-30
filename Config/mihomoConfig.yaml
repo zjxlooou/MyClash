@@ -195,6 +195,56 @@ rule-providers:
     url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/youtube.mrs'
     path: './ruleset/youtube.mrs'
     path-in-bundle: 'geo/geosite/youtube.mrs'
+  tiktok:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/tiktok.mrs'
+    path: './ruleset/tiktok.mrs'
+    path-in-bundle: 'geo/geosite/tiktok.mrs'
+  instagram:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/instagram.mrs'
+    path: './ruleset/instagram.mrs'
+    path-in-bundle: 'geo/geosite/instagram.mrs'
+  netflix:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/netflix.mrs'
+    path: './ruleset/netflix.mrs'
+    path-in-bundle: 'geo/geosite/netflix.mrs'
+  netflix_ip:
+    <<: *rule_providers_ip
+    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/netflix.mrs'
+    path: './ruleset/netflix_ip.mrs'
+    path-in-bundle: 'geo/geoip/netflix.mrs'
+  hbo:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/hbo.mrs'
+    path: './ruleset/hbo.mrs'
+    path-in-bundle: 'geo/geosite/hbo.mrs'
+  twitch:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/twitch.mrs'
+    path: './ruleset/twitch.mrs'
+    path-in-bundle: 'geo/geosite/twitch.mrs'
+  disney:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/disney.mrs'
+    path: './ruleset/disney.mrs'
+    path-in-bundle: 'geo/geosite/disney.mrs'
+  niconico:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/niconico.mrs'
+    path: './ruleset/niconico.mrs'
+    path-in-bundle: 'geo/geosite/niconico.mrs'
+  bbc:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/bbc.mrs'
+    path: './ruleset/bbc.mrs'
+    path-in-bundle: 'geo/geosite/bbc.mrs'
+  pornhub:
+    <<: *rule_providers_domain
+    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/pornhub.mrs'
+    path: './ruleset/pornhub.mrs'
+    path-in-bundle: 'geo/geosite/pornhub.mrs'
   googlefcm:
     <<: *rule_providers_domain
     url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/googlefcm.mrs'
@@ -285,21 +335,6 @@ rule-providers:
     url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/spotify.mrs'
     path: './ruleset/spotify.mrs'
     path-in-bundle: 'geo/geosite/spotify.mrs'
-  tiktok:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/tiktok.mrs'
-    path: './ruleset/tiktok.mrs'
-    path-in-bundle: 'geo/geosite/tiktok.mrs'
-  netflix:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/netflix.mrs'
-    path: './ruleset/netflix.mrs'
-    path-in-bundle: 'geo/geosite/netflix.mrs'
-  netflix_ip:
-    <<: *rule_providers_ip
-    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/netflix.mrs'
-    path: './ruleset/netflix_ip.mrs'
-    path-in-bundle: 'geo/geoip/netflix.mrs'
   cloudflare:
     <<: *rule_providers_domain
     url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/cloudflare.mrs'
@@ -325,11 +360,6 @@ rule-providers:
     url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/apple@cn.mrs'
     path: './ruleset/apple@cn.mrs'
     path-in-bundle: 'geo/geosite/apple@cn.mrs'
-  instagram:
-    <<: *rule_providers_domain
-    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/instagram.mrs'
-    path: './ruleset/instagram.mrs'
-    path-in-bundle: 'geo/geosite/instagram.mrs'
 
 # --- 策略组 (Proxy Groups) ---
 
@@ -470,9 +500,9 @@ proxy-groups:
     default-selected: '美国'
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ChatGPT.png'
 
-  - name: 'YouTube'
+  - name: 'Media'
     <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/YouTube.png'
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ForeignMedia.png'
 
   - name: 'FCM'
     <<: [*group_common_select, *proxies_direct]
@@ -515,10 +545,6 @@ proxy-groups:
     <<: [*group_common_select, *proxies_default]
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Twitter.png'
 
-  - name: 'Instagram'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Instagram.png'
-
   - name: 'Emby'
     <<: [*group_common_select, *proxies_direct]
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Emby.png'
@@ -526,14 +552,6 @@ proxy-groups:
   - name: 'Spotify'
     <<: [*group_common_select, *proxies_direct]
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png'
-
-  - name: 'TikTok'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/TikTok.png'
-
-  - name: 'Netflix'
-    <<: [*group_common_select, *proxies_default]
-    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Netflix.png'
 
   - name: '广告拦截'
     <<: [*group_common_select, *proxies_reject]
@@ -660,7 +678,16 @@ rules:
 
   # 代理规则（域名）
   - RULE-SET,ai,AI
-  - RULE-SET,youtube,YouTube
+  - RULE-SET,youtube,Media
+  - RULE-SET,tiktok,Media
+  - RULE-SET,instagram,Media
+  - RULE-SET,netflix,Media
+  - RULE-SET,hbo,Media
+  - RULE-SET,twitch,Media
+  - RULE-SET,disney,Media
+  - RULE-SET,niconico,Media
+  - RULE-SET,bbc,Media
+  - RULE-SET,pornhub,Media
   - RULE-SET,googlefcm,FCM
   - RULE-SET,google,Google
   - RULE-SET,github,GitHub
@@ -671,13 +698,10 @@ rules:
   - RULE-SET,pixiv,Pixiv
   - RULE-SET,steam,Steam
   - RULE-SET,twitter,Twitter
-  - RULE-SET,instagram,Instagram
   - RULE-SET,emby,Emby
   - DOMAIN-SUFFIX,mb3admin.com,Emby
   - DOMAIN-KEYWORD,emby,Emby
   - RULE-SET,spotify,Spotify
-  - RULE-SET,tiktok,TikTok
-  - RULE-SET,netflix,Netflix
 
   # 代理规则（IP）
   - RULE-SET,google_ip,Google,no-resolve

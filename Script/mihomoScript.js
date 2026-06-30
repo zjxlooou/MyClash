@@ -15,7 +15,7 @@
  */
 const ruleOptionsEnable = {
   AI: true, // 国外AI服务
-  YouTube: true, // YouTube
+  Media: true, // 国外视频平台
   FCM: true, // GoogleFCM服务
   Google: true, // Google服务
   GitHub: true, // GitHub服务
@@ -26,11 +26,8 @@ const ruleOptionsEnable = {
   Pixiv: true, // Pixiv绘画网站
   Steam: true, // Steam游戏平台
   Twitter: true, // Twitter社交平台
-  Instagram: true, // Instagram社交平台
   Emby: true, // Emby媒体服务
   Spotify: true, // Spotify音乐服务
-  TikTok: true, // TikTok短视频平台
-  Netflix: true, // Netflix视频服务
   AdBlock: true, // 广告拦截
 };
 
@@ -255,7 +252,7 @@ const serviceConfigs = [
     rules: ['RULE-SET,ai,AI'],
   },
   {
-    name: 'YouTube',
+    name: 'Media',
     providers: {
       youtube: {
         ...ruleProviderCommonDomain,
@@ -263,9 +260,81 @@ const serviceConfigs = [
         path: './ruleset/youtube.mrs',
         'path-in-bundle': 'geo/geosite/youtube.mrs',
       },
+      tiktok: {
+        ...ruleProviderCommonDomain,
+        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/tiktok.mrs',
+        path: './ruleset/tiktok.mrs',
+        'path-in-bundle': 'geo/geosite/tiktok.mrs',
+      },
+      instagram: {
+        ...ruleProviderCommonDomain,
+        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/instagram.mrs',
+        path: './ruleset/instagram.mrs',
+        'path-in-bundle': 'geo/geosite/instagram.mrs',
+      },
+      netflix: {
+        ...ruleProviderCommonDomain,
+        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/netflix.mrs',
+        path: './ruleset/netflix.mrs',
+        'path-in-bundle': 'geo/geosite/netflix.mrs',
+      },
+      netflix_ip: {
+        ...ruleProviderCommonIpcidr,
+        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/netflix.mrs',
+        path: './ruleset/netflix_ip.mrs',
+        'path-in-bundle': 'geo/geoip/netflix.mrs',
+      },
+      hbo: {
+        ...ruleProviderCommonDomain,
+        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/hbo.mrs',
+        path: './ruleset/hbo.mrs',
+        'path-in-bundle': 'geo/geosite/hbo.mrs',
+      },
+      twitch: {
+        ...ruleProviderCommonDomain,
+        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/twitch.mrs',
+        path: './ruleset/twitch.mrs',
+        'path-in-bundle': 'geo/geosite/twitch.mrs',
+      },
+      disney: {
+        ...ruleProviderCommonDomain,
+        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/disney.mrs',
+        path: './ruleset/disney.mrs',
+        'path-in-bundle': 'geo/geosite/disney.mrs',
+      },
+      niconico: {
+        ...ruleProviderCommonDomain,
+        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/niconico.mrs',
+        path: './ruleset/niconico.mrs',
+        'path-in-bundle': 'geo/geosite/niconico.mrs',
+      },
+      bbc: {
+        ...ruleProviderCommonDomain,
+        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/bbc.mrs',
+        path: './ruleset/bbc.mrs',
+        'path-in-bundle': 'geo/geosite/bbc.mrs',
+      },
+      pornhub: {
+        ...ruleProviderCommonDomain,
+        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/pornhub.mrs',
+        path: './ruleset/pornhub.mrs',
+        'path-in-bundle': 'geo/geosite/pornhub.mrs',
+      },
     },
-    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/YouTube.png',
-    rules: ['RULE-SET,youtube,YouTube'],
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/ForeignMedia.png',
+    rules: [
+      'RULE-SET,youtube,Media',
+      'RULE-SET,tiktok,Media',
+      'RULE-SET,instagram,Media',
+      'RULE-SET,netflix,Media',
+      'RULE-SET,netflix_ip,Media,no-resolve',
+      'RULE-SET,hbo,Media',
+      'RULE-SET,twitch,Media',
+      'RULE-SET,disney,Media',
+      'RULE-SET,niconico,Media',
+      'RULE-SET,bbc,Media',
+      'RULE-SET,pornhub,Media',
+    ],
   },
   {
     name: 'FCM',
@@ -431,19 +500,6 @@ const serviceConfigs = [
     rules: ['RULE-SET,twitter,Twitter', 'RULE-SET,twitter_ip,Twitter,no-resolve'],
   },
   {
-    name: 'Instagram',
-    providers: {
-      instagram: {
-        ...ruleProviderCommonDomain,
-        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/instagram.mrs',
-        path: './ruleset/instagram.mrs',
-        'path-in-bundle': 'geo/geosite/instagram.mrs',
-      },
-    },
-    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Instagram.png',
-    rules: ['RULE-SET,instagram,Instagram'],
-  },
-  {
     name: 'Emby',
     direct: true,
     providers: {
@@ -470,38 +526,6 @@ const serviceConfigs = [
     },
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png',
     rules: ['RULE-SET,spotify,Spotify'],
-  },
-  {
-    name: 'TikTok',
-    providers: {
-      tiktok: {
-        ...ruleProviderCommonDomain,
-        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/tiktok.mrs',
-        path: './ruleset/tiktok.mrs',
-        'path-in-bundle': 'geo/geosite/tiktok.mrs',
-      },
-    },
-    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/TikTok.png',
-    rules: ['RULE-SET,tiktok,TikTok'],
-  },
-  {
-    name: 'Netflix',
-    providers: {
-      netflix: {
-        ...ruleProviderCommonDomain,
-        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/netflix.mrs',
-        path: './ruleset/netflix.mrs',
-        'path-in-bundle': 'geo/geosite/netflix.mrs',
-      },
-      netflix_ip: {
-        ...ruleProviderCommonIpcidr,
-        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/netflix.mrs',
-        path: './ruleset/netflix_ip.mrs',
-        'path-in-bundle': 'geo/geoip/netflix.mrs',
-      },
-    },
-    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Netflix.png',
-    rules: ['RULE-SET,netflix,Netflix', 'RULE-SET,netflix_ip,Netflix,no-resolve'],
   },
   {
     name: 'AdBlock',
