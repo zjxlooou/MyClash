@@ -512,7 +512,7 @@ const serviceConfigs = [
     providers: {
       adblockmihomolite: {
         ...ruleProviderCommonDomain,
-        url: 'https://fastly.jsdelivr.net/gh/217heidai/adblockfilters@main/rules/adblockmihomolite.mrs',
+        url: 'https://anti-ad.net/mihomo.mrs',
         path: './ruleset/adblockmihomolite.mrs',
         'path-in-bundle': 'geo/geosite/category-ads-all.mrs',
       },
