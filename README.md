@@ -82,6 +82,7 @@ https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfigLite.
 > - _若不需要某个分流策略组，可在脚本中将 `ruleOptionsEnable` 对应值设为 `false`_
 
 - `默认代理`
+- `手动选择`
 - `自动选择`
 - `负载均衡`
 - `AI`
@@ -103,7 +104,7 @@ https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfigLite.
 
 ## 内置节点组
 
-> - _所有组均为手动选择（select），内部包含对应的自动选择策略组和负载均衡策略组_
+> - _所有组均为手动选择（select），内部包含对应的自动选择策略组_
 > - _未匹配到地区组的节点节点将归类至 「其他节点」_
 
 - `香港`
