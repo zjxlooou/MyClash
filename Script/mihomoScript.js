@@ -60,33 +60,34 @@ const rules = [
   'RULE-SET,microsoft_cn,直连',
   'DOMAIN,fsend.cn,直连',
   'DOMAIN,international-gfe.download.nvidia.com,直连',
+  'DOMAIN-SUFFIX,hdslb.com,直连',
 ];
 
 // 定义地区策略组
 const regionDefinitions = [
   {
     name: '香港',
-    regex: /🇭🇰|香港|HK|[Hh]ong\s*[Kk]ong/,
+    regex: /🇭🇰|香港|(?<![A-Za-z])HK(?![A-Za-z])|hong\s*kong/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png',
   },
   {
     name: '日本',
-    regex: /🇯🇵|日本|JP|[Jj]apan/,
+    regex: /🇯🇵|日本|(?<![A-Za-z])JP(?![A-Za-z])|japan/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png',
   },
   {
     name: '美国',
-    regex: /🇺🇸|美国|US|[Aa]merica|[Uu]nited\s*[Ss]tates/,
+    regex: /🇺🇸|美国|(?<![A-Za-z])US(?![A-Za-z])|america|united\s*states/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png',
   },
   {
     name: '新加坡',
-    regex: /🇸🇬|新加坡|狮城|SG|[Ss]ingapore/,
+    regex: /🇸🇬|新加坡|狮城|(?<![A-Za-z])SG(?![A-Za-z])|singapore/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png',
   },
   {
     name: '台湾省',
-    regex: /🇹🇼|台湾|TW|[Tt]aiwan/,
+    regex: /🇹🇼|台湾|(?<![A-Za-z])TW(?![A-Za-z])|taiwan/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png',
   },
   {
@@ -161,6 +162,12 @@ const baseRuleProviders = {
     url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/microsoft@cn.mrs',
     path: './ruleset/microsoft@cn.mrs',
     'path-in-bundle': 'geo/geosite/microsoft@cn.mrs',
+  },
+  'geolocation-cn': {
+    ...ruleProviderCommonDomain,
+    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/geolocation-cn.mrs',
+    path: './ruleset/geolocation-cn.mrs',
+    'path-in-bundle': 'geo/geosite/geolocation-cn.mrs',
   },
   cn_additional: {
     ...ruleProviderCommonDomain,
@@ -768,13 +775,73 @@ function main(config) {
   const originalDnsConfig = config.dns || {};
 
   // 过滤常见的公共 DNS
-  const commonDnsRegex =
-    /(223\.5\.5\.5|223\.6\.6\.6|119\.29\.29\.29|1\.12\.12\.12|120\.53\.53\.53|114\.114\.114\.114|180\.76\.76\.76|1\.1\.1\.1|1\.0\.0\.1|8\.8\.8\.8|8\.8\.4\.4|94\.140\.14\.14|94\.140\.15\.15|127\.0\.0\.1|alidns|doh\.pub|dot\.pub|dnspod|dns\.baidu|dns\.google|cloudflare|adguard|system)/i;
+  const commonDnsList = [
+    // IP（国内）
+    '223.5.5.5',
+    '223.6.6.6',
+    '119.29.29.29',
+    '1.12.12.12',
+    '120.53.53.53',
+    '114.114.114.114',
+    '180.76.76.76',
+    '1.2.4.8',
+    '116.116.116.116',
+    '101.226.4.6',
+    '123.125.81.6',
+    '180.184.1.1',
+    '180.184.2.2',
+
+    // IP（国外）
+    '1.1.1.1',
+    '1.0.0.1',
+    '8.8.8.8',
+    '8.8.4.4',
+    '9.9.9.9',
+    '149.112.112.112',
+    '208.67.222.222',
+    '208.67.220.220',
+    '94.140.14.14',
+    '94.140.15.15',
+    '76.76.2.0',
+    '76.76.10.0',
+    '185.228.168.9',
+    '185.228.169.9',
+    '77.88.8.8',
+    '77.88.8.1',
+    '156.154.70.1',
+    '156.154.71.1',
+
+    // 非公共DNS，但部分机场会使用这个
+    '127.0.0.1',
+
+    // 关键词（国内）
+    'alidns',
+    'doh.pub',
+    'dot.pub',
+    'dnspod',
+    'dns.baidu',
+
+    // 关键词（国外）
+    'dns.google',
+    'cloudflare',
+    'quad9',
+    'opendns',
+    'nextdns',
+    'adguard',
+
+    // 系统
+    'system',
+  ];
+
+  const isCommonDns = (dns) => {
+    const value = String(dns).toLowerCase();
+    return commonDnsList.some((keyword) => value.includes(keyword));
+  };
 
   // 提取私有 DNS
   const privateDNS = [
     ...new Set([...(originalDnsConfig['nameserver'] || []), ...(originalDnsConfig['proxy-server-nameserver'] || [])]),
-  ].filter((dns) => !commonDnsRegex.test(String(dns)));
+  ].filter((dns) => !isCommonDns(dns));
 
   // 收集所有节点域名
   const proxyDomains = new Set(
@@ -915,7 +982,7 @@ function main(config) {
 
     // 兜底规则
     'RULE-SET,gfw,默认代理',
-    'RULE-SET,cn_additional,直连',
+    'RULE-SET,geolocation-cn,直连',
     'RULE-SET,cn_ip,直连',
     'MATCH,漏网之鱼',
   ];
