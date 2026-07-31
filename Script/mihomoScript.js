@@ -8,12 +8,16 @@
 
 // --- 静态配置区域 ---
 
+// 适配 Bettbox 自定义配置参数
+const Compatible_With_Bettbox = { ruleOptionsEnable: true };
+
 /**
- * 分流策略组启用配置，若不需要某个策略组，请设为 false
+ * 自定义配置选项
  * true = 启用
  * false = 禁用
  */
 const ruleOptionsEnable = {
+  // 以下为分流策略配置
   AI: true, // 国外AI服务
   Media: true, // 国外视频平台
   FCM: true, // GoogleFCM服务
@@ -27,27 +31,20 @@ const ruleOptionsEnable = {
   Emby: true, // Emby媒体服务
   PikPak: true, // PikPak网盘服务
   Spotify: true, // Spotify音乐服务
+  Crypto: true, // 加密货币相关服务
   EHentai: true, // E-Hentai网站
   AdBlock: true, // 广告拦截
+
+  // 以下为非分流策略配置
+  显示默认隐藏的策略组: false, // 是否显示默认隐藏的策略组
+  生成地区自动选择组: true, // 是否生成地区自动选择策略组
+  隐藏地区手动选择组: false, // 是否隐藏地区手动选择策略组
+  过滤高倍率节点: false, // 是否过滤高倍率节点
+  过滤非地区节点: true, // 是否过滤非地区节点
 };
-
-/**
- * 全局排除高倍率节点配置
- * 该配置用于启用全局排除高倍率节点功能
- * true = 启用
- * false = 禁用
- */
-const excludeHighRateProxiesEnable = false;
-
-// 定义全局排除节点的正则表达式，用于排除非地区的信息节点
-const excludeFilter =
-  /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|⚠️|@|expire|http|com|traffic/iu;
 
 // 预定义 rules
 const rules = [
-  // 禁用国外 QUIC 流量
-  'AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT',
-
   // 私有网络直连
   'RULE-SET,private,直连',
   'RULE-SET,private_ip,直连,no-resolve',
@@ -61,6 +58,33 @@ const rules = [
   'DOMAIN,fsend.cn,直连',
   'DOMAIN,international-gfe.download.nvidia.com,直连',
   'DOMAIN-SUFFIX,hdslb.com,直连',
+
+  // 禁用国外 QUIC 流量
+  'AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT',
+
+  'RULE-SET,github,默认代理',
+];
+
+// 定义全局排除节点的正则表达式，用于排除非地区的信息节点
+const excludeFilter =
+  /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|提示|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|⚠️|@|expire|http|com|traffic/iu;
+
+// 直连节点
+const directProxies = [
+  {
+    name: '🇨🇳 直连 | 双栈',
+    type: 'direct',
+  },
+  {
+    name: '🇨🇳 直连 | IPv4优先',
+    type: 'direct',
+    'ip-version': 'ipv4-prefer',
+  },
+  {
+    name: '🇨🇳 直连 | IPv6优先',
+    type: 'direct',
+    'ip-version': 'ipv6-prefer',
+  },
 ];
 
 // 定义地区策略组
@@ -169,12 +193,6 @@ const baseRuleProviders = {
     path: './ruleset/geolocation-cn.mrs',
     'path-in-bundle': 'geo/geosite/geolocation-cn.mrs',
   },
-  cn_additional: {
-    ...ruleProviderCommonDomain,
-    url: 'https://static-file-global.353355.xyz/rules/cn-additional-list.mrs',
-    path: './ruleset/cn-additional-list.mrs',
-    'path-in-bundle': 'geo/geosite/cn.mrs',
-  },
   cn_ip: {
     ...ruleProviderCommonIpcidr,
     url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/cn.mrs',
@@ -205,6 +223,12 @@ const baseRuleProviders = {
     path: './ruleset/fakeip-filter.mrs',
     'path-in-bundle': 'geo/geosite/private.mrs',
   },
+  cn_additional: {
+    ...ruleProviderCommonDomain,
+    url: 'https://static-file-global.353355.xyz/rules/cn-additional-list.mrs',
+    path: './ruleset/cn-additional-list.mrs',
+    'path-in-bundle': 'geo/geosite/cn.mrs',
+  },
   cn: {
     ...ruleProviderCommonDomain,
     url: 'https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/direct.mrs',
@@ -227,7 +251,6 @@ const groupBaseOption = {
 const selectBaseOption = {
   ...groupBaseOption,
   type: 'select',
-  hidden: false,
 };
 
 // url-test策略组通用配置
@@ -237,7 +260,6 @@ const urlTestBaseOption = {
   tolerance: 50,
   'exclude-type': 'DIRECT',
   icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png',
-  hidden: true,
 };
 
 // load-balance策略组通用配置
@@ -247,7 +269,6 @@ const loadBalanceBaseOption = {
   strategy: 'sticky-sessions',
   'exclude-type': 'DIRECT',
   icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Round_Robin.png',
-  hidden: true,
 };
 
 // 定义分流策略组配置
@@ -485,7 +506,17 @@ const serviceConfigs = [
       },
     },
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Emby.png',
-    rules: ['RULE-SET,emby,Emby', 'DOMAIN-SUFFIX,mb3admin.com,Emby', 'DOMAIN-KEYWORD,emby,Emby'],
+    rules: [
+      'RULE-SET,emby,Emby',
+      'DOMAIN-SUFFIX,mb3admin.com,Emby',
+      'DOMAIN-SUFFIX,nubebelle.com,Emby',
+      'DOMAIN-KEYWORD,emby,Emby',
+      'PROCESS-NAME,com.mb.android,Emby',
+      'PROCESS-NAME,tv.emby.embyatv,Emby',
+      'PROCESS-NAME,com.hush.yamby,Emby',
+      'PROCESS-NAME,com.jellycine.app,Emby',
+      'PROCESS-NAME,com.mountains.hills,Emby',
+    ],
   },
   {
     name: 'PikPak',
@@ -514,6 +545,20 @@ const serviceConfigs = [
     },
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Spotify.png',
     rules: ['RULE-SET,spotify,Spotify'],
+  },
+  {
+    name: 'Crypto',
+    defaultSelected: '日本',
+    providers: {
+      cryptocurrency: {
+        ...ruleProviderCommonDomain,
+        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/category-cryptocurrency.mrs',
+        path: './ruleset/cryptocurrency.mrs',
+        'path-in-bundle': 'geo/geosite/category-cryptocurrency.mrs',
+      },
+    },
+    icon: 'https://fastly.jsdelivr.net/gh/lige47/QuanX-icon-rule@main/icon/04ProxySoft/Bitcoin.png',
+    rules: ['RULE-SET,cryptocurrency,Crypto'],
   },
   {
     name: 'EHentai',
@@ -547,18 +592,31 @@ const serviceConfigs = [
 
 // 定义创建地区策略组的函数
 function createRegionGroup(name, icon, proxies) {
-  const urlTestName = `${name}-自动选择`;
+  if (ruleOptionsEnable.生成地区自动选择组) {
+    const urlTestName = `${name}-自动选择`;
+    return [
+      {
+        ...urlTestBaseOption,
+        name: urlTestName,
+        proxies,
+        hidden: !ruleOptionsEnable.显示默认隐藏的策略组,
+      },
+      {
+        ...selectBaseOption,
+        name,
+        icon,
+        proxies: [urlTestName, ...proxies],
+        hidden: ruleOptionsEnable.隐藏地区手动选择组,
+      },
+    ];
+  }
   return [
-    {
-      ...urlTestBaseOption,
-      name: urlTestName,
-      proxies,
-    },
     {
       ...selectBaseOption,
       name,
       icon,
-      proxies: [urlTestName, ...proxies],
+      proxies: [...proxies],
+      hidden: ruleOptionsEnable.隐藏地区手动选择组,
     },
   ];
 }
@@ -624,7 +682,7 @@ function matchDomainPattern(pattern, domains) {
 function main(config) {
   const newConfig = {};
 
-  const highRateRegex = excludeHighRateProxiesEnable
+  const highRateRegex = ruleOptionsEnable.过滤高倍率节点
     ? regionDefinitions.find((r) => r.name === '高倍率节点')?.regex
     : null;
 
@@ -632,7 +690,10 @@ function main(config) {
   const filteredProxies = (config.proxies || []).filter((proxy) => {
     const type = String(proxy.type ?? '').toLowerCase();
     return (
-      type !== 'direct' && type !== 'reject' && !excludeFilter.test(proxy.name) && !highRateRegex?.test(proxy.name)
+      type !== 'direct' &&
+      type !== 'reject' &&
+      (ruleOptionsEnable.过滤非地区节点 ? !excludeFilter.test(proxy.name) : true) &&
+      !highRateRegex?.test(proxy.name)
     );
   });
 
@@ -687,6 +748,9 @@ function main(config) {
   const finalRules = [...rules];
   const finalRuleProviders = { ...baseRuleProviders };
 
+  // 获取所有节点名称
+  const allProxiesNames = filteredProxies.map((p) => p.name);
+
   // 筛选类型为 select 的地区策略组
   const groupNamesOfSelect = generatedRegionGroups.filter((g) => g.type === 'select').map((g) => g.name);
 
@@ -701,29 +765,40 @@ function main(config) {
     {
       ...selectBaseOption,
       name: '手动选择',
-      'include-all': true,
-      'exclude-type': 'DIRECT',
+      proxies: [...allProxiesNames],
       icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Static.png',
     },
     {
       ...urlTestBaseOption,
       name: '自动选择',
-      'include-all': true,
+      proxies: [...allProxiesNames],
+      hidden: !ruleOptionsEnable.显示默认隐藏的策略组,
     },
     {
       ...loadBalanceBaseOption,
       name: '负载均衡',
-      'include-all': true,
+      proxies: [...allProxiesNames],
+      hidden: !ruleOptionsEnable.显示默认隐藏的策略组,
     },
   );
 
   // 构建分流策略组
+
+  // 优先添加 AdBlock 规则
+  const adBlockConfig = serviceConfigs.find((svc) => svc.name === 'AdBlock');
+  if (adBlockConfig && ruleOptionsEnable[adBlockConfig.name]) {
+    finalRules.push(...adBlockConfig.rules);
+    Object.assign(finalRuleProviders, adBlockConfig.providers);
+  }
+
   for (const svc of serviceConfigs) {
     if (!ruleOptionsEnable[svc.name]) continue;
 
     // 添加分流策略组对应的 Rule 和 Rule Providers
-    finalRules.push(...svc.rules);
-    Object.assign(finalRuleProviders, svc.providers || {});
+    if (svc.name !== adBlockConfig?.name) {
+      finalRules.push(...svc.rules);
+      Object.assign(finalRuleProviders, svc.providers);
+    }
 
     // 添加分流策略组对应的节点列表
     const groupProxies = svc.reject
@@ -752,9 +827,10 @@ function main(config) {
     {
       ...selectBaseOption,
       name: '直连',
-      proxies: ['🇨🇳 直连 | 双栈', '🇨🇳 直连 | IPv4优先', '🇨🇳 直连 | IPv6优先'],
+      proxies: [...directProxies.map((p) => p.name)],
       url: 'https://connectivitycheck.platform.hicloud.com/generate_204',
       icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/China_Map.png',
+      hidden: ruleOptionsEnable.隐藏地区手动选择组,
     },
   );
 
@@ -915,6 +991,7 @@ function main(config) {
     ...proxyServerHosts,
   };
 
+  newConfig['mixed-port'] = 7890;
   newConfig['allow-lan'] = true;
   newConfig['ipv6'] = true;
   newConfig['mode'] = 'rule';
@@ -953,31 +1030,11 @@ function main(config) {
     'dns-hijack': ['any:53', 'tcp://any:53'],
   };
 
-  // 添加节点
-  newConfig['proxies'] = [
-    ...filteredProxies,
-    {
-      name: '🇨🇳 直连 | IPv4优先',
-      type: 'direct',
-      'ip-version': 'ipv4-prefer',
-    },
-    {
-      name: '🇨🇳 直连 | IPv6优先',
-      type: 'direct',
-      'ip-version': 'ipv6-prefer',
-    },
-    {
-      name: '🇨🇳 直连 | 双栈',
-      type: 'direct',
-    },
-  ];
-
+  newConfig['proxies'] = [...filteredProxies, ...directProxies];
   newConfig['proxy-groups'] = [globalGroup, ...functionalGroups, ...generatedRegionGroups];
   newConfig['rule-providers'] = finalRuleProviders;
 
   newConfig['rules'] = [
-    'RULE-SET,github,默认代理',
-
     ...finalRules,
 
     // 兜底规则
