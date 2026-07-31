@@ -1,7 +1,7 @@
 /**
  * mihomo配置覆写脚本（全量版）
  * 作者：AIsouler
- * 原仓库：https://github.com/AIsouler/MyClash
+ * 源仓库：https://github.com/AIsouler/MyClash
  * 脚本链接：https://raw.githubusercontent.com/AIsouler/MyClash/main/Script/mihomoScript.js
  * 友情推荐，非常好用、省电且内存占用低的代理软件：https://github.com/appshubcc/Bettbox
  */
@@ -17,6 +17,11 @@ const Compatible_With_Bettbox = { ruleOptionsEnable: true };
  * false = 禁用
  */
 const ruleOptionsEnable = {
+  // 基础策略组
+  手动选择: true, // 是否启用手动选择策略组
+  自动选择: true, // 是否启用自动选择策略组
+  负载均衡: true, // 是否启用负载均衡策略组
+
   // 以下为分流策略配置
   AI: true, // 国外AI服务
   Media: true, // 国外视频平台
@@ -39,12 +44,14 @@ const ruleOptionsEnable = {
   显示默认隐藏的策略组: false, // 是否显示默认隐藏的策略组
   生成地区自动选择组: true, // 是否生成地区自动选择策略组
   隐藏地区手动选择组: false, // 是否隐藏地区手动选择策略组
+  分流组添加所有节点: false, // 是否为分流策略组添加所有节点
   过滤高倍率节点: false, // 是否过滤高倍率节点
   过滤非地区节点: true, // 是否过滤非地区节点
+  屏蔽国外QUIC: true, // 是否屏蔽国外QUIC流量
 };
 
-// 预定义 rules
-const rules = [
+// 定义前置直连规则
+const directRules = [
   // 私有网络直连
   'RULE-SET,private,直连',
   'RULE-SET,private_ip,直连,no-resolve',
@@ -58,16 +65,16 @@ const rules = [
   'DOMAIN,fsend.cn,直连',
   'DOMAIN,international-gfe.download.nvidia.com,直连',
   'DOMAIN-SUFFIX,hdslb.com,直连',
-
-  // 禁用国外 QUIC 流量
-  'AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT',
-
-  'RULE-SET,github,默认代理',
 ];
 
-// 定义全局排除节点的正则表达式，用于排除非地区的信息节点
+// 定义全局排除节点的正则表达式，用于排除非地区节点
 const excludeFilter =
-  /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|提示|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|⚠️|@|expire|http|com|traffic/iu;
+  /群|返利|循环|官网|客服|网站|网址|获取|订阅|流量|到期|机场|下次|版本|官址|备用|过期|已用|联系|邮箱|工单|贩卖|通知|倒卖|防止|国内|地址|频道|无法|说明|使用|提示|访问|支持|教程|关注|更新|作者|加入|超时|收藏|福利|邀请|好友|失联|选择|剩余|公益|发布|DIZTNA|通路|登录|禁止|定时|渠道|牢记|永久|余额|阁下|本站|刷新|导航|建议|重置|以下|⚠️|@|expire|http|com|traffic/iu;
+
+// 屏蔽国外QUIC
+const blockForeignQuic = [
+  'AND,((NETWORK,UDP),(DST-PORT,443),(NOT,((OR,((RULE-SET,cn_additional),(RULE-SET,cn_ip,no-resolve)))))),REJECT',
+];
 
 // 直连节点
 const directProxies = [
@@ -91,26 +98,31 @@ const directProxies = [
 const regionDefinitions = [
   {
     name: '香港',
+    flag: '🇭🇰',
     regex: /🇭🇰|香港|(?<![A-Za-z])HK(?![A-Za-z])|hong\s*kong/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Hong_Kong.png',
   },
   {
     name: '日本',
+    flag: '🇯🇵',
     regex: /🇯🇵|日本|(?<![A-Za-z])JP(?![A-Za-z])|japan/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Japan.png',
   },
   {
     name: '美国',
+    flag: '🇺🇸',
     regex: /🇺🇸|美国|(?<![A-Za-z])US(?![A-Za-z])|america|united\s*states/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/United_States.png',
   },
   {
     name: '新加坡',
+    flag: '🇸🇬',
     regex: /🇸🇬|新加坡|狮城|(?<![A-Za-z])SG(?![A-Za-z])|singapore/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Singapore.png',
   },
   {
     name: '台湾省',
+    flag: '🇹🇼',
     regex: /🇹🇼|台湾|(?<![A-Za-z])TW(?![A-Za-z])|taiwan/i,
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Taiwan.png',
   },
@@ -202,12 +214,6 @@ const baseRuleProviders = {
 
   // --- 代理规则集 ---
 
-  github: {
-    ...ruleProviderCommonDomain,
-    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/github.mrs',
-    path: './ruleset/github.mrs',
-    'path-in-bundle': 'geo/geosite/github.mrs',
-  },
   gfw: {
     ...ruleProviderCommonDomain,
     url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/gfw.mrs',
@@ -271,10 +277,36 @@ const loadBalanceBaseOption = {
   icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Round_Robin.png',
 };
 
+// 定义基础策略组
+const baseGroups = [
+  {
+    name: '手动选择',
+    baseOption: selectBaseOption,
+    includeAll: true,
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Static.png',
+  },
+  {
+    name: '自动选择',
+    baseOption: urlTestBaseOption,
+    includeAll: true,
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Auto.png',
+    defaultHidden: true,
+  },
+  {
+    name: '负载均衡',
+    baseOption: loadBalanceBaseOption,
+    includeAll: true,
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Round_Robin.png',
+    defaultHidden: true,
+  },
+];
+
 // 定义分流策略组配置
 const serviceConfigs = [
+  ...baseGroups,
   {
     name: 'AI',
+    baseOption: selectBaseOption,
     defaultSelected: '美国',
     providers: {
       ai: {
@@ -289,6 +321,7 @@ const serviceConfigs = [
   },
   {
     name: 'Media',
+    baseOption: selectBaseOption,
     defaultSelected: '日本',
     providers: {
       youtube: {
@@ -368,6 +401,7 @@ const serviceConfigs = [
   },
   {
     name: 'FCM',
+    baseOption: selectBaseOption,
     direct: true,
     defaultSelected: '直连',
     providers: {
@@ -383,6 +417,7 @@ const serviceConfigs = [
   },
   {
     name: 'Google',
+    baseOption: selectBaseOption,
     providers: {
       google: {
         ...ruleProviderCommonDomain,
@@ -402,8 +437,15 @@ const serviceConfigs = [
   },
   {
     name: 'Microsoft',
+    baseOption: selectBaseOption,
     direct: true,
     providers: {
+      github: {
+        ...ruleProviderCommonDomain,
+        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/github.mrs',
+        path: './ruleset/github.mrs',
+        'path-in-bundle': 'geo/geosite/github.mrs',
+      },
       microsoft: {
         ...ruleProviderCommonDomain,
         url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/microsoft.mrs',
@@ -412,10 +454,11 @@ const serviceConfigs = [
       },
     },
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Microsoft.png',
-    rules: ['RULE-SET,microsoft,Microsoft'],
+    rules: ['RULE-SET,github,默认代理', 'RULE-SET,microsoft,Microsoft'],
   },
   {
     name: 'Apple',
+    baseOption: selectBaseOption,
     direct: true,
     providers: {
       apple: {
@@ -430,6 +473,7 @@ const serviceConfigs = [
   },
   {
     name: 'Telegram',
+    baseOption: selectBaseOption,
     providers: {
       telegram: {
         ...ruleProviderCommonDomain,
@@ -449,6 +493,7 @@ const serviceConfigs = [
   },
   {
     name: 'Steam',
+    baseOption: selectBaseOption,
     direct: true,
     providers: {
       steam: {
@@ -463,6 +508,7 @@ const serviceConfigs = [
   },
   {
     name: 'TikTok',
+    baseOption: selectBaseOption,
     defaultSelected: '日本',
     providers: {
       tiktok: {
@@ -477,6 +523,7 @@ const serviceConfigs = [
   },
   {
     name: 'Twitter',
+    baseOption: selectBaseOption,
     providers: {
       twitter: {
         ...ruleProviderCommonDomain,
@@ -496,6 +543,7 @@ const serviceConfigs = [
   },
   {
     name: 'Emby',
+    baseOption: selectBaseOption,
     direct: true,
     providers: {
       emby: {
@@ -520,6 +568,7 @@ const serviceConfigs = [
   },
   {
     name: 'PikPak',
+    baseOption: selectBaseOption,
     direct: true,
     providers: {
       pikpak: {
@@ -534,6 +583,7 @@ const serviceConfigs = [
   },
   {
     name: 'Spotify',
+    baseOption: selectBaseOption,
     direct: true,
     providers: {
       spotify: {
@@ -548,6 +598,7 @@ const serviceConfigs = [
   },
   {
     name: 'Crypto',
+    baseOption: selectBaseOption,
     defaultSelected: '日本',
     providers: {
       cryptocurrency: {
@@ -562,6 +613,7 @@ const serviceConfigs = [
   },
   {
     name: 'EHentai',
+    baseOption: selectBaseOption,
     defaultSelected: '美国',
     providers: {
       ehentai: {
@@ -576,6 +628,7 @@ const serviceConfigs = [
   },
   {
     name: 'AdBlock',
+    baseOption: selectBaseOption,
     reject: true,
     providers: {
       adblockmihomolite: {
@@ -615,7 +668,7 @@ function createRegionGroup(name, icon, proxies) {
       ...selectBaseOption,
       name,
       icon,
-      proxies: [...proxies],
+      proxies,
       hidden: ruleOptionsEnable.隐藏地区手动选择组,
     },
   ];
@@ -677,25 +730,55 @@ function matchDomainPattern(pattern, domains) {
   return false;
 }
 
+// 节点匹配地区但没有国旗时添加国旗前缀
+function addRegionFlag(proxy) {
+  for (const region of regionDefinitions) {
+    // 排除倍率组
+    if (region.name === '低倍率节点' || region.name === '高倍率节点') {
+      continue;
+    }
+    if (region.regex.test(proxy.name)) {
+      if (!/[\u{1F1E6}-\u{1F1FF}]{2}/u.test(proxy.name)) {
+        proxy.name = `${region.flag} ${proxy.name}`;
+      }
+      break;
+    }
+  }
+  return proxy;
+}
+
 // --- 主入口 ---
 
 function main(config) {
   const newConfig = {};
 
+  // --- 节点过滤及验证 ---
+
   const highRateRegex = ruleOptionsEnable.过滤高倍率节点
     ? regionDefinitions.find((r) => r.name === '高倍率节点')?.regex
     : null;
 
-  // 过滤节点列表
-  const filteredProxies = (config.proxies || []).filter((proxy) => {
-    const type = String(proxy.type ?? '').toLowerCase();
-    return (
-      type !== 'direct' &&
-      type !== 'reject' &&
-      (ruleOptionsEnable.过滤非地区节点 ? !excludeFilter.test(proxy.name) : true) &&
-      !highRateRegex?.test(proxy.name)
+  // 判断节点是否匹配地区组（排除倍率组）
+  const isRegionProxy = (proxyName) =>
+    regionDefinitions.some(
+      (region) => region.name !== '低倍率节点' && region.name !== '高倍率节点' && region.regex.test(proxyName),
     );
-  });
+
+  // 过滤节点列表
+  const filteredProxies = (config.proxies || [])
+    .filter((proxy) => {
+      const type = String(proxy.type ?? '').toLowerCase();
+
+      // 匹配到地区组的节点不过滤
+      const matchedRegion = isRegionProxy(proxy.name);
+      return (
+        type !== 'direct' &&
+        type !== 'reject' &&
+        (!ruleOptionsEnable.过滤非地区节点 || matchedRegion || !excludeFilter.test(proxy.name)) &&
+        !highRateRegex?.test(proxy.name)
+      );
+    })
+    .map((proxy) => addRegionFlag({ ...proxy }));
 
   // 验证节点列表是否存在代理节点
   if (!filteredProxies.length) {
@@ -745,7 +828,7 @@ function main(config) {
   // --- 构建分流策略组 ---
 
   const functionalGroups = [];
-  const finalRules = [...rules];
+  const finalRules = [];
   const finalRuleProviders = { ...baseRuleProviders };
 
   // 获取所有节点名称
@@ -754,41 +837,23 @@ function main(config) {
   // 筛选类型为 select 的地区策略组
   const groupNamesOfSelect = generatedRegionGroups.filter((g) => g.type === 'select').map((g) => g.name);
 
-  // 生成基础策略组
-  functionalGroups.push(
-    {
-      ...selectBaseOption,
-      name: '默认代理',
-      proxies: [...groupNamesOfSelect, '手动选择', '自动选择', '负载均衡'],
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png',
-    },
-    {
-      ...selectBaseOption,
-      name: '手动选择',
-      proxies: [...allProxiesNames],
-      icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Static.png',
-    },
-    {
-      ...urlTestBaseOption,
-      name: '自动选择',
-      proxies: [...allProxiesNames],
-      hidden: !ruleOptionsEnable.显示默认隐藏的策略组,
-    },
-    {
-      ...loadBalanceBaseOption,
-      name: '负载均衡',
-      proxies: [...allProxiesNames],
-      hidden: !ruleOptionsEnable.显示默认隐藏的策略组,
-    },
-  );
+  // 获取基础策略组名称
+  const baseGroupNames = baseGroups.filter((g) => ruleOptionsEnable[g.name]).map((g) => g.name);
+
+  functionalGroups.push({
+    ...selectBaseOption,
+    name: '默认代理',
+    proxies: [...groupNamesOfSelect, ...baseGroupNames],
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png',
+  });
 
   // 构建分流策略组
 
   // 优先添加 AdBlock 规则
   const adBlockConfig = serviceConfigs.find((svc) => svc.name === 'AdBlock');
   if (adBlockConfig && ruleOptionsEnable[adBlockConfig.name]) {
-    finalRules.push(...adBlockConfig.rules);
-    Object.assign(finalRuleProviders, adBlockConfig.providers);
+    finalRules.push(...(adBlockConfig.rules || []));
+    Object.assign(finalRuleProviders, adBlockConfig.providers || {});
   }
 
   for (const svc of serviceConfigs) {
@@ -796,22 +861,32 @@ function main(config) {
 
     // 添加分流策略组对应的 Rule 和 Rule Providers
     if (svc.name !== adBlockConfig?.name) {
-      finalRules.push(...svc.rules);
-      Object.assign(finalRuleProviders, svc.providers);
+      finalRules.push(...(svc.rules || []));
+      Object.assign(finalRuleProviders, svc.providers || {});
     }
 
     // 添加分流策略组对应的节点列表
-    const groupProxies = svc.reject
-      ? ['REJECT', 'REJECT-DROP', 'PASS']
-      : ['默认代理', '手动选择', '自动选择', '负载均衡', ...groupNamesOfSelect, ...(svc.direct ? ['直连'] : [])];
+    let groupProxies = [];
+    if (svc.includeAll) {
+      groupProxies = [...allProxiesNames];
+    } else if (svc.reject) {
+      groupProxies = ['REJECT', 'REJECT-DROP', 'PASS'];
+    } else {
+      groupProxies = !ruleOptionsEnable.分流组添加所有节点
+        ? ['默认代理', ...baseGroupNames, ...groupNamesOfSelect, ...(svc.direct ? ['直连'] : [])]
+        : ['默认代理', ...baseGroupNames, ...groupNamesOfSelect, ...allProxiesNames, ...(svc.direct ? ['直连'] : [])];
+    }
 
     functionalGroups.push({
-      ...selectBaseOption,
+      ...svc.baseOption,
       name: svc.name,
       icon: svc.icon,
       proxies: groupProxies,
       ...(svc.defaultSelected !== undefined && {
         'default-selected': svc.defaultSelected,
+      }),
+      ...(svc.defaultHidden && {
+        hidden: !ruleOptionsEnable.显示默认隐藏的策略组,
       }),
     });
   }
@@ -1035,6 +1110,8 @@ function main(config) {
   newConfig['rule-providers'] = finalRuleProviders;
 
   newConfig['rules'] = [
+    ...directRules,
+    ...(ruleOptionsEnable.屏蔽国外QUIC ? blockForeignQuic : []),
     ...finalRules,
 
     // 兜底规则
