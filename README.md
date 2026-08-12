@@ -39,18 +39,20 @@
 - ✅ 支持自定义是否过滤高倍率节点
 - ✅ 支持自定义是否过滤非地区节点
 - ✅ 支持自定义是否屏蔽国外 QUIC 流量
+- ✅ 支持在脚本中配置自定义节点（自动生成“自建节点”策略组，与订阅节点重名时自动添加“自建-”前缀）
+- ✅ 支持链式代理（将自定义节点作为落地节点，经“链式中转”策略组通过订阅节点中转；启用后自动为自定义节点添加 `dialer-proxy`）
 
 ### 使用方法（脚本）
 
 复制以下任意一个链接或者复制完整代码后按如图所示步骤导入到代理客户端，以 [Bettbox](https://github.com/appshubcc/Bettbox) 为例
 
-- [mihomoScript.js（全量版）](/Script/mihomoScript.js)
+- [mihomoScript.js（全量版）](/Script/mihomoScript.js)，复制下面这个链接使用👇👇👇
 
 ```txt
 https://raw.githubusercontent.com/AIsouler/MyClash/main/Script/mihomoScript.js
 ```
 
-- [Script.js（精简版）](/Script/Script.js) （仅包含少量分流策略组）
+- [Script.js（精简版）](/Script/Script.js)，仅包含少量分流策略组，复制下面这个链接使用👇👇👇
 
 ```txt
 https://raw.githubusercontent.com/AIsouler/MyClash/main/Script/Script.js
@@ -75,13 +77,13 @@ https://raw.githubusercontent.com/AIsouler/MyClash/main/Script/Script.js
 
 复制以下任意一个链接或者复制完整代码后导入代理客户端
 
-- [mihomoConfig.yaml（全量版）](/Config/mihomoConfig.yaml)
+- [mihomoConfig.yaml（全量版）](/Config/mihomoConfig.yaml)，复制下面这个链接使用👇👇👇
 
 ```txt
 https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfig.yaml
 ```
 
-- [mihomoConfigLite.yaml（精简版）](/Config/mihomoConfigLite.yaml)（仅包含少量分流策略组）
+- [mihomoConfigLite.yaml（精简版）](/Config/mihomoConfigLite.yaml)，仅包含少量分流策略组，复制下面这个链接使用👇👇👇
 
 ```txt
 https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfigLite.yaml
@@ -131,6 +133,8 @@ https://raw.githubusercontent.com/AIsouler/MyClash/main/Config/mihomoConfigLite.
 - `AdBlock`
 - `直连` （可自定义IP优先级）
 - `漏网之鱼`
+- `自建节点` （仅添加了自定义节点时生成）
+- `链式中转` （仅启用链式代理且配置自定义节点时生成）
 
 ## 内置节点组
 
