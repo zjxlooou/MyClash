@@ -35,6 +35,8 @@ const ruleOptionsEnable = {
   过滤高倍率节点: false, // 是否过滤高倍率节点
   过滤非地区节点: true, // 是否过滤非地区节点
   屏蔽国外QUIC: true, // 是否屏蔽国外QUIC流量
+  代理IPV4优先: false, // 是否将订阅节点统一为 IPv4 优先（与“代理IPV6优先”同时开启时不生效）
+  代理IPV6优先: false, // 是否将订阅节点统一为 IPv6 优先（与“代理IPV4优先”同时开启时不生效）
   链式代理: false, // 是否启用链式代理（自定义节点作为落地节点，经“链式中转”策略组中转）
 };
 
@@ -103,6 +105,16 @@ const directProxies = [
     name: '🇨🇳 直连 | IPv6优先',
     type: 'direct',
     'ip-version': 'ipv6-prefer',
+  },
+  {
+    name: '🇨🇳 直连 | 仅IPv4',
+    type: 'direct',
+    'ip-version': 'ipv4',
+  },
+  {
+    name: '🇨🇳 直连 | 仅IPv6',
+    type: 'direct',
+    'ip-version': 'ipv6',
   },
 ];
 
@@ -446,6 +458,19 @@ function fixDialerProxy(proxy, renameMap, normalizedProxyNames) {
 }
 
 /**
+ * 读取代理 IP 版本偏好：仅其中一个开关开启时返回对应偏好，
+ * 同时开启或同时关闭时返回 null（不应用任何偏好，节点保持原样）
+ */
+function getIpVersionPreference() {
+  const ipv4PreferEnabled = ruleOptionsEnable.代理IPV4优先;
+  const ipv6PreferEnabled = ruleOptionsEnable.代理IPV6优先;
+
+  if (ipv4PreferEnabled && !ipv6PreferEnabled) return 'ipv4-prefer';
+  if (ipv6PreferEnabled && !ipv4PreferEnabled) return 'ipv6-prefer';
+  return null;
+}
+
+/**
  * 过滤并标准化节点：剔除内置/信息节点、按配置过滤、去重、修复 dialer-proxy 引用，空列表时抛错
  */
 function filterAndNormalizeProxies(config) {
@@ -504,6 +529,14 @@ function filterAndNormalizeProxies(config) {
     throw new Error('配置文件中未找到任何代理节点，请使用机场提供的配置文件进行覆写');
   }
 
+  // 应用代理 IP 版本偏好（仅订阅节点；自定义节点与直连节点不参与）
+  const ipVersionPreference = getIpVersionPreference();
+  if (ipVersionPreference) {
+    return filteredProxies.map((proxy) =>
+      proxy['ip-version'] === ipVersionPreference ? proxy : { ...proxy, 'ip-version': ipVersionPreference },
+    );
+  }
+
   return filteredProxies;
 }
 
@@ -547,14 +580,14 @@ function createRegionGroup(name, icon, proxies) {
 /**
  * 将节点按地区/倍率归类，构建地区策略组、倍率策略组与“其他节点”组
  */
-function buildRegionGroups(filteredProxies) {
+function buildRegionGroups(filteredProxies, customProxies) {
   const generateRateGroupEnabled = ruleOptionsEnable.生成倍率组;
 
   // 节点分类
   const regionGroups = Object.fromEntries(allRegionDefinitions.map(({ name }) => [name, []]));
   const otherProxies = [];
 
-  for (const proxy of filteredProxies) {
+  for (const proxy of [...filteredProxies, ...customProxies]) {
     const matchedRegions = getMatchedRegions(proxy.name);
     const isRegionProxy = matchedRegions.some((region) => regionDefinitions.includes(region));
 
@@ -848,8 +881,9 @@ const commonDnsList = [
 ];
 
 // 国内外 DNS 定义
-const chinaDNS = ['https://dns.alidns.com/dns-query#DIRECT', 'https://doh.pub/dns-query#DIRECT'];
-const foreignDNS = ['https://dns.cloudflare.com/dns-query#默认代理', 'https://dns.google/dns-query#默认代理'];
+const chinaDNS = ['223.5.5.5', '119.29.29.29'];
+const chinaDohDNS = ['https://223.5.5.5/dns-query#DIRECT', 'https://1.12.12.12/dns-query#DIRECT'];
+const foreignDNS = ['https://cloudflare-dns.com/dns-query#默认代理', 'https://dns.google/dns-query#默认代理'];
 
 /**
  * hosts 匹配优先级：精确 > +. > . > *（同级按出现顺序）
@@ -1057,24 +1091,23 @@ function buildDnsAndHostsConfig(config, filteredProxies) {
     'cache-algorithm': 'arc',
     'use-system-hosts': true,
     'enhanced-mode': 'fake-ip',
-    'fake-ip-range': '198.18.0.1/16',
+    'fake-ip-range': '198.18.0.1/15',
+    'fake-ip-range6': '2001:2::1/48',
     'fake-ip-filter': ['rule-set:private', 'rule-set:fakeip_filter', ...proxyFakeIpFilter],
-    'proxy-server-nameserver': [...(privateDNS.length > 0 ? privateDNS : chinaDNS)],
+    'proxy-server-nameserver': privateDNS.length > 0 ? privateDNS : chinaDohDNS,
     ...(Object.keys(proxyServerPolicy).length > 0 && {
       'proxy-server-nameserver-policy': proxyServerPolicy,
     }),
-    'default-nameserver': ['223.5.5.5', '119.29.29.29'],
-    nameserver: [...foreignDNS],
+    'default-nameserver': chinaDNS,
+    nameserver: foreignDNS,
     'nameserver-policy': {
-      'rule-set:cn': [...chinaDNS],
+      'rule-set:cn': chinaDNS,
     },
-    'direct-nameserver': ['system', '223.5.5.5', '119.29.29.29'],
+    'direct-nameserver': ['system', ...chinaDNS],
   };
 
   const hosts = {
-    'dns.alidns.com': ['223.5.5.5', '223.6.6.6'],
-    'doh.pub': ['1.12.12.12', '120.53.53.53'],
-    'dns.cloudflare.com': ['1.1.1.1', '1.0.0.1'],
+    'cloudflare-dns.com': ['1.1.1.1', '1.0.0.1'],
     'dns.google': ['8.8.8.8', '8.8.4.4'],
 
     // 解决谷歌商店无法下载的问题
@@ -1105,7 +1138,7 @@ function main(config) {
   const { customProxies, customProxyNames, customGroup } = buildCustomizeGroups(filteredProxies);
 
   // 构建地区组和倍率组
-  const generatedRegionGroups = buildRegionGroups(filteredProxies);
+  const generatedRegionGroups = buildRegionGroups(filteredProxies, customProxies);
 
   // 构建基础策略组和分流策略组（含“自建节点”策略组与“链式中转”策略组）
   const { globalGroup, functionalGroups, functionalRules, finalRuleProviders, chainGroup } = buildFunctionalGroups(

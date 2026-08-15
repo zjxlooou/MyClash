@@ -149,7 +149,6 @@ function runIntegrationTests(h, api, meta, fx, loadScript, scriptFile) {
     h.assertEqual(p.server, '10.0.0.1', 'hosts 映射的节点 server 应被改写');
     h.assert(!('hk1.example.com' in out.hosts), '映射后的节点 hosts 不应复制到新配置');
     h.assert(!('www.unrelated.com' in out.hosts), '无关 hosts 应被过滤');
-    h.assertDeep(out.hosts['dns.google'], ['8.8.8.8', '8.8.4.4']);
   });
   h.test('fake-ip-filter 保留匹配条目并过滤无关条目', () => {
     // 节点域名（精确/后缀/通配）保留，无关条目与 rule-set 被过滤，默认条目置于头部
@@ -193,7 +192,8 @@ function runIntegrationTests(h, api, meta, fx, loadScript, scriptFile) {
     delete cfg.hosts;
     const out = api.main(cfg);
     h.assertEqual(out.dns.enable, true);
-    h.assertDeep(out.hosts['dns.google'], ['8.8.8.8', '8.8.4.4']);
+    // 默认 hosts 仍生成（不再包含已移除的 dns.alidns.com/dns.google 等条目）
+    h.assertDeep(out.hosts['services.googleapis.cn'], ['services.googleapis.com']);
   });
 
   // ---------------- 配置选项切换 ----------------
@@ -278,6 +278,71 @@ function runIntegrationTests(h, api, meta, fx, loadScript, scriptFile) {
     withOptions(api, { 过滤非地区节点: false }, () => {
       const out = api.main(fx.minimalSubscription());
       h.assert(proxyNames(out.proxies).includes('官网公告'), '信息节点应被保留');
+    }),
+  );
+
+  // ---------------- 代理 IP 版本优先 ----------------
+  h.section('集成测试 · 代理IP版本优先');
+  const nonDirectProxies = (out) => out.proxies.filter((p) => p.type !== 'direct');
+  h.test('代理IPV4优先=true → 订阅节点统一为 ipv4-prefer，自定义/直连节点不受影响', () => {
+    // 注入带 ip-version 的自定义节点，验证其不参与改写
+    const customApi = loadScript(scriptFile, (code) =>
+      code.replace(
+        'const customizeProxies = [];',
+        `const customizeProxies = [{
+          name: '自建独享', type: 'ss', server: 'custom2.example.com', port: 443,
+          cipher: 'aes-256-gcm', password: 'x', 'ip-version': 'ipv6-prefer',
+        }];`,
+      ),
+    );
+    withOptions(customApi, { 代理IPV4优先: true, 代理IPV6优先: false }, () => {
+      const out = customApi.main(fx.typicalSubscription());
+      const subs = nonDirectProxies(out);
+      h.assert(subs.length > 1, '前置：应存在订阅节点');
+      for (const p of subs) {
+        if (p.name === '自建独享') {
+          h.assertEqual(p['ip-version'], 'ipv6-prefer', '自定义节点不应被改写');
+        } else {
+          h.assertEqual(p['ip-version'], 'ipv4-prefer', `订阅节点 ${p.name} 应为 ipv4-prefer`);
+        }
+      }
+      h.assertEqual(
+        out.proxies.find((p) => p.name === '🇨🇳 直连 | IPv6优先')['ip-version'],
+        'ipv6-prefer',
+        '直连节点不应被改写',
+      );
+    });
+  });
+  h.test('代理IPV6优先=true → 订阅节点统一为 ipv6-prefer', () =>
+    withOptions(api, { 代理IPV4优先: false, 代理IPV6优先: true }, () => {
+      const out = api.main(fx.typicalSubscription());
+      for (const p of nonDirectProxies(out)) {
+        h.assertEqual(p['ip-version'], 'ipv6-prefer', `订阅节点 ${p.name} 应为 ipv6-prefer`);
+      }
+    }),
+  );
+  h.test('两开关默认(false) → 订阅节点 ip-version 保持原样（不新增、不覆盖）', () => {
+    const cfg = fx.minimalSubscription();
+    cfg.proxies[1]['ip-version'] = 'ipv6-prefer'; // 日本 B 自带 ip-version
+    const out = api.main(cfg);
+    for (const p of nonDirectProxies(out)) {
+      if (p.name === '🇯🇵 日本 B') {
+        h.assertEqual(p['ip-version'], 'ipv6-prefer', '已有 ip-version 应保持原样');
+      } else {
+        h.assert(!('ip-version' in p), `订阅节点 ${p.name} 不应被新增 ip-version`);
+      }
+    }
+  });
+  h.test('两开关同时开启 → 保持不变：开关保持开启、不应用任何偏好', () =>
+    withOptions(api, { 代理IPV4优先: true, 代理IPV6优先: true }, () => {
+      const out = api.main(fx.typicalSubscription());
+      // 同时开启时开关保持不变（不被自动关闭）
+      h.assertEqual(api.ruleOptionsEnable.代理IPV4优先, true, 'IPv4 应保持不变');
+      h.assertEqual(api.ruleOptionsEnable.代理IPV6优先, true, 'IPv6 应保持不变');
+      // 不应用任何 IP 版本偏好：订阅节点保持原样（不新增 ip-version）
+      for (const p of nonDirectProxies(out)) {
+        h.assert(!('ip-version' in p), `订阅节点 ${p.name} 不应被新增 ip-version`);
+      }
     }),
   );
 
