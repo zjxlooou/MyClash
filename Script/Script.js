@@ -22,6 +22,7 @@ const ruleOptionsEnable = {
   自动选择: true, // 是否启用自动选择策略组
 
   // 以下为分流策略配置
+  Google: true, // Google服务
   AI: true, // 国外AI服务
   Telegram: true, // Telegram通讯软件
   Steam: true, // Steam游戏平台
@@ -52,7 +53,6 @@ const prefixRules = [
   'RULE-SET,microsoft_cn,直连',
   'DOMAIN,fsend.cn,直连',
   'DOMAIN,international-gfe.download.nvidia.com,直连',
-  'DOMAIN-SUFFIX,hdslb.com,直连',
 ];
 
 // 此处添加自定义节点，填入下方[]内（可选，留空则不生成“自建节点”策略组）
@@ -188,72 +188,60 @@ const baseRuleProviders = {
 
   private: {
     ...ruleProviderCommonDomain,
-    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/private.mrs',
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/private.mrs',
     path: './ruleset/private.mrs',
     'path-in-bundle': 'geo/geosite/private.mrs',
   },
   private_ip: {
     ...ruleProviderCommonIpcidr,
-    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/private.mrs',
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/private.mrs',
     path: './ruleset/private_ip.mrs',
     'path-in-bundle': 'geo/geoip/private.mrs',
   },
   games_cn: {
     ...ruleProviderCommonDomain,
-    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/category-games@cn.mrs',
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-games@cn.mrs',
     path: './ruleset/category-games@cn.mrs',
     'path-in-bundle': 'geo/geosite/category-games@cn.mrs',
   },
   epicgames: {
     ...ruleProviderCommonDomain,
-    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/epicgames.mrs',
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/epicgames.mrs',
     path: './ruleset/epicgames.mrs',
     'path-in-bundle': 'geo/geosite/epicgames.mrs',
   },
   apple_cn: {
     ...ruleProviderCommonDomain,
-    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/apple@cn.mrs',
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/apple@cn.mrs',
     path: './ruleset/apple@cn.mrs',
     'path-in-bundle': 'geo/geosite/apple@cn.mrs',
   },
   microsoft_cn: {
     ...ruleProviderCommonDomain,
-    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/microsoft@cn.mrs',
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/microsoft@cn.mrs',
     path: './ruleset/microsoft@cn.mrs',
     'path-in-bundle': 'geo/geosite/microsoft@cn.mrs',
   },
   'geolocation-cn': {
     ...ruleProviderCommonDomain,
-    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/geolocation-cn.mrs',
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-cn.mrs',
     path: './ruleset/geolocation-cn.mrs',
     'path-in-bundle': 'geo/geosite/geolocation-cn.mrs',
   },
   cn_ip: {
     ...ruleProviderCommonIpcidr,
-    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/cn.mrs',
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/cn.mrs',
     path: './ruleset/cn_ip.mrs',
     'path-in-bundle': 'geo/geoip/cn.mrs',
   },
 
   // --- 代理规则集 ---
 
-  google: {
+  'geolocation-!cn': {
     ...ruleProviderCommonDomain,
-    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/google.mrs',
-    path: './ruleset/google.mrs',
-    'path-in-bundle': 'geo/geosite/google.mrs',
-  },
-  google_ip: {
-    ...ruleProviderCommonIpcidr,
-    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/google.mrs',
-    path: './ruleset/google_ip.mrs',
-    'path-in-bundle': 'geo/geoip/google.mrs',
-  },
-  gfw: {
-    ...ruleProviderCommonDomain,
-    url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/gfw.mrs',
-    path: './ruleset/gfw.mrs',
-    'path-in-bundle': 'geo/geosite/gfw.mrs',
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/geolocation-!cn.mrs',
+    path: './ruleset/geolocation-!cn.mrs',
+    'path-in-bundle': 'geo/geosite/geolocation-!cn.mrs',
   },
 
   // --- 其他规则集 ---
@@ -272,7 +260,7 @@ const baseRuleProviders = {
   },
   cn: {
     ...ruleProviderCommonDomain,
-    url: 'https://fastly.jsdelivr.net/gh/wwqgtxx/clash-rules@release/direct.mrs',
+    url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/cn.mrs',
     path: './ruleset/cn.mrs',
     'path-in-bundle': 'geo/geosite/cn.mrs',
   },
@@ -324,13 +312,33 @@ const baseGroups = [
 const serviceConfigs = [
   ...baseGroups,
   {
+    name: 'Google',
+    baseOption: selectBaseOption,
+    providers: {
+      google: {
+        ...ruleProviderCommonDomain,
+        url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/google.mrs',
+        path: './ruleset/google.mrs',
+        'path-in-bundle': 'geo/geosite/google.mrs',
+      },
+      google_ip: {
+        ...ruleProviderCommonIpcidr,
+        url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/google.mrs',
+        path: './ruleset/google_ip.mrs',
+        'path-in-bundle': 'geo/geoip/google.mrs',
+      },
+    },
+    icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Google_Search.png',
+    rules: ['RULE-SET,google,Google', 'RULE-SET,google_ip,Google,no-resolve'],
+  },
+  {
     name: 'AI',
     baseOption: selectBaseOption,
     defaultSelected: '美国',
     providers: {
       ai: {
         ...ruleProviderCommonDomain,
-        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/category-ai-!cn.mrs',
+        url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/category-ai-!cn.mrs',
         path: './ruleset/ai.mrs',
         'path-in-bundle': 'geo/geosite/category-ai-!cn.mrs',
       },
@@ -344,13 +352,13 @@ const serviceConfigs = [
     providers: {
       telegram: {
         ...ruleProviderCommonDomain,
-        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/telegram.mrs',
+        url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/telegram.mrs',
         path: './ruleset/telegram.mrs',
         'path-in-bundle': 'geo/geosite/telegram.mrs',
       },
       telegram_ip: {
         ...ruleProviderCommonIpcidr,
-        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geoip/telegram.mrs',
+        url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geoip/telegram.mrs',
         path: './ruleset/telegram_ip.mrs',
         'path-in-bundle': 'geo/geoip/telegram.mrs',
       },
@@ -365,13 +373,19 @@ const serviceConfigs = [
     providers: {
       steam: {
         ...ruleProviderCommonDomain,
-        url: 'https://fastly.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@meta/geo/geosite/steam.mrs',
+        url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/geo/geosite/steam.mrs',
         path: './ruleset/steam.mrs',
         'path-in-bundle': 'geo/geosite/steam.mrs',
       },
+      steam_asn: {
+        ...ruleProviderCommonIpcidr,
+        url: 'https://fastly.jsdelivr.net/gh/appshubcc/bett-rules@meta/asn/AS32590.mrs',
+        path: './ruleset/steam_asn.mrs',
+        'path-in-bundle': 'asn/AS32590.mrs',
+      },
     },
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Steam.png',
-    rules: ['RULE-SET,steam,Steam'],
+    rules: ['RULE-SET,steam,Steam', 'RULE-SET,steam_asn,Steam,no-resolve'],
   },
   {
     name: 'AdBlock',
@@ -414,20 +428,16 @@ const flagRegex = /[\u{1F1E6}-\u{1F1FF}]{2}/u;
 function normalizeProxyName(proxy) {
   const originalName = proxy.name;
 
-  // 提取节点原有国旗
   const flag = originalName.match(flagRegex)?.[0];
 
-  // 有国旗时移除国旗，再移除多余空格
   const nameWithoutFlag = (flag ? originalName.replace(flag, '') : originalName).replace(/\s+/g, ' ').trim();
 
   const matchedRegions = getMatchedRegions(originalName);
 
-  // 如果已有国旗则直接使用原国旗
-  // 如果没有国旗，则从地区匹配结果中取地区国旗
   const regionFlag = flag || matchedRegions.find((region) => region.flag)?.flag;
+
   const normalizedName = regionFlag ? `${regionFlag} ${nameWithoutFlag}` : nameWithoutFlag;
 
-  // 预缓存标准化后的节点名称，供后续构建策略组复用
   if (normalizedName !== originalName) {
     regionMatchCache.set(normalizedName, matchedRegions);
   }
@@ -442,17 +452,14 @@ function fixDialerProxy(proxy, renameMap, normalizedProxyNames) {
   const target = proxy['dialer-proxy'];
   if (!target) return proxy;
 
-  // 目标节点被重命名 → 更新引用为标准化后的名称
   if (renameMap.has(target)) {
     return { ...proxy, 'dialer-proxy': renameMap.get(target) };
   }
 
-  // 目标节点被保留且未重命名 → 引用依然有效
   if (normalizedProxyNames.has(target)) {
     return proxy;
   }
 
-  // 目标节点被过滤移除（或引用目标本就不存在）→ 删除引用，避免引用不存在的节点
   const copy = { ...proxy };
   delete copy['dialer-proxy'];
   return copy;
@@ -475,7 +482,6 @@ function getIpVersionPreference() {
  * 过滤并标准化节点：剔除内置/信息节点、按配置过滤、去重、修复 dialer-proxy 引用，空列表时抛错
  */
 function filterAndNormalizeProxies(config) {
-  // 清空缓存，避免上次运行残留的旧名称
   regionMatchCache.clear();
 
   const filterHighRateProxiesEnabled = ruleOptionsEnable.过滤高倍率节点;
@@ -487,7 +493,6 @@ function filterAndNormalizeProxies(config) {
 
   const originalProxies = config.proxies || [];
 
-  // 过滤节点列表（尚未重命名）
   const filteredRawProxies = originalProxies.filter((proxy) => {
     const type = String(proxy.type ?? '').toLowerCase();
     if (type === 'direct' || type === 'reject' || type === 'rematch') return false;
@@ -501,10 +506,7 @@ function filterAndNormalizeProxies(config) {
     return isRegionProxy || !excludeFilter.test(proxy.name);
   });
 
-  // 重命名映射：原名称 -> 标准化后的名称
   const renameMap = new Map();
-
-  // 标准化节点名称并去重（保留首个同名节点）
   const normalizedProxies = [];
   const uniqueNames = new Set();
 
@@ -519,18 +521,14 @@ function filterAndNormalizeProxies(config) {
     }
   }
 
-  // 标准化后的节点名称集合（用于判断 dialer-proxy 引用目标是否仍有效）
   const normalizedProxyNames = new Set(normalizedProxies.map((p) => p.name));
 
-  // 修复 dialer-proxy 引用
   const filteredProxies = normalizedProxies.map((proxy) => fixDialerProxy(proxy, renameMap, normalizedProxyNames));
 
-  // 验证节点列表是否存在代理节点
   if (!filteredProxies.length) {
     throw new Error('配置文件中未找到任何代理节点，请使用机场提供的配置文件进行覆写');
   }
 
-  // 应用代理 IP 版本偏好（仅订阅节点；自定义节点与直连节点不参与）
   const ipVersionPreference = getIpVersionPreference();
   if (ipVersionPreference) {
     return filteredProxies.map((proxy) =>
@@ -562,7 +560,7 @@ function createRegionGroup(name, icon, proxies) {
         ...selectBaseOption,
         name,
         icon,
-        proxies: [urlTestName, ...proxies],
+        proxies: [...proxies, urlTestName],
         hidden: hideManualSelectGroupEnabled,
       },
     ];
@@ -584,7 +582,6 @@ function createRegionGroup(name, icon, proxies) {
 function buildRegionGroups(filteredProxies, customProxies) {
   const generateRateGroupEnabled = ruleOptionsEnable.生成倍率组;
 
-  // 节点分类
   const regionGroups = Object.fromEntries(allRegionDefinitions.map(({ name }) => [name, []]));
   const otherProxies = [];
 
@@ -601,7 +598,6 @@ function buildRegionGroups(filteredProxies, customProxies) {
     }
   }
 
-  // 构建 地区/倍率 策略组
   const generatedRegionGroups = allRegionDefinitions
     .filter((r) => regionGroups[r.name].length > 0 && (generateRateGroupEnabled || !rateRegionDefinitions.includes(r)))
     .flatMap((r) => createRegionGroup(r.name, r.icon, regionGroups[r.name]));
@@ -629,7 +625,6 @@ function buildRegionGroups(filteredProxies, customProxies) {
 function buildCustomizeGroups(filteredProxies, customizeList = customizeProxies) {
   const chainEnabled = ruleOptionsEnable.链式代理;
 
-  // 未配置自定义节点时直接返回空结果
   if (!customizeList.length) {
     if (chainEnabled) {
       throw new Error('启用失败，请在脚本中添加自定义节点后尝试');
@@ -637,28 +632,19 @@ function buildCustomizeGroups(filteredProxies, customizeList = customizeProxies)
     return { customProxies: [], customProxyNames: [], customGroup: null };
   }
 
-  // 订阅节点标准化后的名称集合，用于重名判断
   const usedNames = new Set(filteredProxies.map((p) => p.name));
-
-  // 重名时使用的前缀
   const customPrefix = '自建-';
-
-  // 标准化自定义节点并解决重名冲突（与订阅节点重名或自定义节点间重名）
   const customProxies = [];
+
   for (const proxy of customizeList) {
     const normalized = normalizeProxyName(proxy);
-
     let name = normalized.name;
-
-    // 重名时添加前缀并重新标准化（国旗自动回到最前），直至名称唯一；
-    // 标准化会重建“国旗 + 空格 + 名称”格式，这里去掉前缀后多余的空格
     while (usedNames.has(name)) {
       name = normalizeProxyName({ name: `${customPrefix}${name}` }).name.replace(`${customPrefix} `, customPrefix);
     }
     usedNames.add(name);
 
     let customProxy = name === normalized.name ? normalized : { ...normalized, name };
-    // 链式代理启用时强制添加/覆盖 dialer-proxy，使自定义节点经“链式中转”策略组中转
     if (chainEnabled && customProxy['dialer-proxy'] !== dialerProxyName) {
       customProxy = { ...customProxy, 'dialer-proxy': dialerProxyName };
     }
@@ -667,7 +653,6 @@ function buildCustomizeGroups(filteredProxies, customizeList = customizeProxies)
 
   const customProxyNames = customProxies.map((p) => p.name);
 
-  // 自建节点/链式落地 策略组
   const customGroup = {
     ...selectBaseOption,
     name: chainEnabled ? '链式落地' : '自建节点',
@@ -697,30 +682,17 @@ function buildFunctionalGroups(filteredProxies, generatedRegionGroups, customize
   const functionalRules = [];
   const finalRuleProviders = { ...baseRuleProviders };
 
-  // cn_additional 规则集仅服务于 “屏蔽国外QUIC” 规则，关闭该选项时无需生成
   if (!blockForeignQuicEnabled) {
     delete finalRuleProviders.cn_additional;
   }
 
-  // 自定义节点信息（未配置自定义节点时为空）
   const { customProxyNames = [], customGroup = null } = customizeInfo || {};
-
-  // 筛选后的节点名称列表（不含自定义节点）
   const filteredProxyNames = filteredProxies.map((p) => p.name);
-
-  // 获取所有节点名称（自定义节点优先，便于在基础策略组中查看）
   const allProxiesNames = [...customProxyNames, ...filteredProxyNames];
-
-  // 筛选类型为 select 的地区策略组
   const groupNamesOfSelect = generatedRegionGroups.filter((g) => g.type === 'select').map((g) => g.name);
-
-  // 获取基础策略组名称
   const baseGroupNames = baseGroups.filter((g) => ruleOptionsEnable[g.name]).map((g) => g.name);
-
-  // 自建节点策略组名称（未配置自定义节点时为空数组）
   const customGroupNames = customGroup ? [customGroup.name] : [];
 
-  // 生成基础策略组
   functionalGroups.push({
     ...selectBaseOption,
     name: '默认代理',
@@ -728,7 +700,6 @@ function buildFunctionalGroups(filteredProxies, generatedRegionGroups, customize
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Proxy.png',
   });
 
-  // 分流规则与规则集收集（AdBlock 规则优先，避免广告域名被其他分流规则抢先匹配）
   const orderedServiceConfigs = [
     ...serviceConfigs.filter((svc) => svc.name === 'AdBlock'),
     ...serviceConfigs.filter((svc) => svc.name !== 'AdBlock'),
@@ -740,11 +711,9 @@ function buildFunctionalGroups(filteredProxies, generatedRegionGroups, customize
     Object.assign(finalRuleProviders, svc.providers || {});
   }
 
-  // 构建分流策略组（保持 serviceConfigs 原有顺序）
   for (const svc of serviceConfigs) {
     if (!ruleOptionsEnable[svc.name]) continue;
 
-    // 添加分流策略组对应的节点列表
     let groupProxies = [];
     if (svc.includeAll) {
       groupProxies = [...allProxiesNames];
@@ -774,7 +743,6 @@ function buildFunctionalGroups(filteredProxies, generatedRegionGroups, customize
     });
   }
 
-  // 添加其他策略组
   functionalGroups.push({
     ...selectBaseOption,
     name: '漏网之鱼',
@@ -782,13 +750,10 @@ function buildFunctionalGroups(filteredProxies, generatedRegionGroups, customize
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Stack.png',
   });
 
-  // 添加自建节点策略组（未配置自定义节点时跳过）
   if (customGroup) {
     functionalGroups.push(customGroup);
   }
 
-  // 链式代理：构建“链式中转”策略组（自定义节点作为落地节点时的中转选择）
-  // 直接放入所有订阅节点（不含自定义节点），不放入策略组，避免与落地节点的 dialer-proxy 形成回环
   const chainGroup =
     chainEnabled && customGroup
       ? {
@@ -799,7 +764,7 @@ function buildFunctionalGroups(filteredProxies, generatedRegionGroups, customize
         }
       : null;
 
-  const directProxiesGroup = {
+  const directGroup = {
     ...selectBaseOption,
     name: '直连',
     proxies: [...directProxies.map((p) => p.name)],
@@ -808,20 +773,19 @@ function buildFunctionalGroups(filteredProxies, generatedRegionGroups, customize
     hidden: hideManualSelectGroupEnabled,
   };
 
-  // 构建 GLOBAL 全局策略组
   const globalGroup = {
     ...selectBaseOption,
     name: 'GLOBAL',
     proxies: [
       ...functionalGroups.map((g) => g.name),
       ...(chainGroup ? [chainGroup.name] : []),
-      directProxiesGroup.name,
+      directGroup.name,
       ...generatedRegionGroups.map((g) => g.name),
     ],
     icon: 'https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Global.png',
   };
 
-  return { globalGroup, functionalGroups, functionalRules, finalRuleProviders, chainGroup, directProxiesGroup };
+  return { globalGroup, functionalGroups, functionalRules, finalRuleProviders, chainGroup, directGroup };
 }
 
 // ---dns和hosts相关处理---
@@ -917,7 +881,6 @@ function matchDomainPattern(pattern, domains) {
       : [...domains].some((d) => d.toLowerCase() === pattern);
   }
 
-  // 通配匹配：统一转为数组遍历（字符串时直接构建单元素数组，避免 Set 中转）
   const domainList = typeof domains === 'string' ? [domains.toLowerCase()] : [...domains].map((d) => d.toLowerCase());
 
   // +.example.com
@@ -951,26 +914,20 @@ function matchDomainPattern(pattern, domains) {
 function applyHostsToProxies(proxies, hosts) {
   if (!hosts || typeof hosts !== 'object') return proxies;
 
-  // 全部有效条目按匹配优先级排序（链式解析需保留中继条目，故不按节点域名预过滤）
   const hostEntries = Object.entries(hosts)
     .filter(
       ([, value]) => (typeof value === 'string' && value.length > 0) || (Array.isArray(value) && value.length > 0),
     )
     .sort((a, b) => hostSpecificity(b[0]) - hostSpecificity(a[0]));
 
-  // 无任何有效条目时直接返回，避免不必要的遍历
   if (hostEntries.length === 0) return proxies;
 
-  // 取映射目标（数组取首个非空字符串），无有效目标时返回 null
   const targetOf = (value) => {
     if (Array.isArray(value)) value = value.find((v) => typeof v === 'string' && v.length > 0);
     return typeof value === 'string' && value.length > 0 ? value : null;
   };
 
-  // 解析结果缓存：相同节点域名只解析一次，后续直接复用
   const resolveCache = new Map();
-
-  // 解析单个节点域名：沿链式映射逐级改写至最终目标，无匹配时原样返回
   const resolve = (server) => {
     const cached = resolveCache.get(server);
     if (cached !== undefined) return cached;
@@ -1024,13 +981,13 @@ function isIpAddress(server) {
 
 /**
  * 构建 DNS 与 hosts：保留私有 DNS、节点域名 policy/fake-ip-filter，并按 hosts 改写节点 server
+ * hosts改写条件（满足任意一个条件即可）：
+ * 1. proxy-server-nameserver 有且仅有一个 DNS 并且该 DNS 包含非空的 listen 值
+ * 2. proxy-server-nameserver 有且仅有一个 DNS 并且该 DNS 包含 127.0.0.1 并且 listen 包含 0.0.0.0
  */
 function buildDnsAndHostsConfig(config, filteredProxies) {
   const originalDnsConfig = config.dns || {};
 
-  // hosts改写条件：
-  // 1. 仅当原配置 proxy-server-nameserver 有且仅有一个 DNS，且该 DNS 包含非空的 listen 时
-  // 2. proxy-server-nameserver 有且仅有一个 DNS 并且包含 127.0.0.1 并且 listen 包含 0.0.0.0
   const proxyServerNameservers = originalDnsConfig['proxy-server-nameserver'] || [];
   const listenValue = originalDnsConfig['listen'];
 
@@ -1047,10 +1004,8 @@ function buildDnsAndHostsConfig(config, filteredProxies) {
     (proxyServerNameservers.some((dns) => String(dns).toLowerCase().includes(listenValue.toLowerCase())) ||
       matchesLocalDnsListener);
 
-  // 根据订阅 hosts 改写节点 server 为映射后的地址（域名或 IP）
   const mappedProxies = shouldRewriteByHosts ? applyHostsToProxies(filteredProxies, config.hosts) : filteredProxies;
 
-  // 节点域名集合
   const proxyDomains = new Set(
     mappedProxies
       .filter((proxy) => typeof proxy.server === 'string')
@@ -1058,12 +1013,10 @@ function buildDnsAndHostsConfig(config, filteredProxies) {
       .filter((server) => !isIpAddress(server)),
   );
 
-  // 命中触发条件时，私有 DNS 提取时直接置空，避免本地监听 DNS 被误留为私有 DNS
   const privateProxyServerNameservers = shouldRewriteByHosts ? [] : proxyServerNameservers;
 
   const isCommonDns = (dns) => commonDnsRegex.test(String(dns));
 
-  // 提取私有 DNS（先剥离 # 策略组后缀，再判断是否为公共 DNS）
   const privateDNS = [
     ...new Set(
       [...(originalDnsConfig['nameserver'] || []), ...privateProxyServerNameservers]
@@ -1072,7 +1025,6 @@ function buildDnsAndHostsConfig(config, filteredProxies) {
     ),
   ];
 
-  // 提取节点域名对应的 DNS 配置（剥离 # 策略组后缀）
   const proxyServerPolicy = {};
   for (const [domain, dns] of Object.entries({
     ...originalDnsConfig['nameserver-policy'],
@@ -1080,22 +1032,18 @@ function buildDnsAndHostsConfig(config, filteredProxies) {
   })) {
     if (!matchDomainPattern(domain, proxyDomains)) continue;
 
-    // 剥离 # 策略组后缀；数组过滤空字符串，空数组视为无效条目
     const value = Array.isArray(dns) ? dns.map(stripDnsSuffix).filter((d) => d.length > 0) : stripDnsSuffix(dns);
     if (Array.isArray(value) && value.length === 0) continue;
 
     proxyServerPolicy[domain] = value;
   }
 
-  // 无节点专属 DNS 策略且存在私有 DNS 时，将节点域名统一映射到私有 DNS
   if (privateDNS.length > 0 && Object.keys(proxyServerPolicy).length === 0) {
     for (const domain of proxyDomains) {
       proxyServerPolicy[domain] = privateDNS;
     }
   }
 
-  // 遍历原配置中的 fake-ip-filter，保留与节点域名匹配的条目
-  // 部分机场的节点域名需走真实 IP 解析，避免 fake-ip 导致节点无法连接
   const originalFakeIpFilter = originalDnsConfig['fake-ip-filter'] || [];
   const proxyFakeIpFilter = originalFakeIpFilter.filter((pattern) => {
     const p = String(pattern);
@@ -1149,20 +1097,15 @@ function buildDnsAndHostsConfig(config, filteredProxies) {
 function main(config) {
   const newConfig = {};
 
-  // 节点过滤、重命名及验证（仅订阅节点）
   const filteredProxies = filterAndNormalizeProxies(config);
 
-  // 处理自定义节点（标准化、解决重名、构建“自建节点”策略组）
   const { customProxies, customProxyNames, customGroup } = buildCustomizeGroups(filteredProxies);
 
-  // 构建地区组和倍率组
   const generatedRegionGroups = buildRegionGroups(filteredProxies, customProxies);
 
-  // 构建基础策略组和分流策略组和部分节点组（含“自建节点”、“链式中转”和“直连”策略组）
-  const { globalGroup, functionalGroups, functionalRules, finalRuleProviders, chainGroup, directProxiesGroup } =
+  const { globalGroup, functionalGroups, functionalRules, finalRuleProviders, chainGroup, directGroup } =
     buildFunctionalGroups(filteredProxies, generatedRegionGroups, { customProxyNames, customGroup });
 
-  // dns和hosts相关处理（仅订阅节点参与 hosts 改写，返回已应用 hosts 映射的节点列表）
   const { dns, hosts, proxies: mappedProxies } = buildDnsAndHostsConfig(config, filteredProxies);
 
   newConfig['dns'] = dns;
@@ -1210,7 +1153,7 @@ function main(config) {
     globalGroup,
     ...functionalGroups,
     ...(chainGroup ? [chainGroup] : []),
-    directProxiesGroup,
+    directGroup,
     ...generatedRegionGroups,
   ];
   newConfig['rule-providers'] = finalRuleProviders;
@@ -1221,9 +1164,7 @@ function main(config) {
     ...functionalRules,
 
     // 兜底规则
-    'RULE-SET,google,默认代理',
-    'RULE-SET,google_ip,默认代理,no-resolve',
-    'RULE-SET,gfw,默认代理',
+    'RULE-SET,geolocation-!cn,默认代理',
     'RULE-SET,geolocation-cn,直连',
     'RULE-SET,cn_ip,直连',
     'RULE-SET,private_ip,直连',
